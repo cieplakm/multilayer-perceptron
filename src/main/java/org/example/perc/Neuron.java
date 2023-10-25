@@ -1,5 +1,6 @@
 package org.example.perc;
 
+import java.util.Random;
 import java.util.stream.DoubleStream;
 
 class Neuron {
@@ -9,12 +10,13 @@ class Neuron {
     Value bias;
 
     Neuron(int inSize) {
-        this.weights = DoubleStream.generate(Math::random)
+        Random random = new Random(3);
+        this.weights = DoubleStream.generate(random::nextDouble)
                 .limit(inSize)
                 .mapToObj(Value::ofGradientable)
                 .toArray(Value[]::new);
 //        this.weights = new Tensor(-0.19, 0.24, -0.29, 0.23, 0.1).values;
-        this.bias = Value.ofGradientable(Math.random());
+        this.bias = Value.ofGradientable(random.nextDouble());
 //        this.bias = Value.ofGradientable(-0.93);
 
         for (Value weight : weights) {

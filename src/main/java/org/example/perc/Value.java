@@ -49,7 +49,7 @@ public class Value {
     }
 
     Value subtract(Value v) {
-        Value value = new Value(data - v.data, this, v);
+        Value value = new Value(valueOf(data).subtract(valueOf(v.data)).doubleValue(), this, v);
 
         double derivative = 1;
 
@@ -61,7 +61,7 @@ public class Value {
     }
 
     Value multiply(Value v) {
-        Value value = new Value(data * v.data, this, v);
+        Value value = new Value(valueOf(data).multiply(valueOf(v.data)).doubleValue() , this, v);
 
         value.backward = () -> {
             this.gradient = valueOf(this.gradient).add(valueOf(v.data).multiply(valueOf(value.gradient))).doubleValue();
@@ -72,9 +72,9 @@ public class Value {
     }
 
     Value sqr() {
-        Value value = new Value(Math.pow(data, 2), this, null);
+        Value value = new Value(BigDecimal.valueOf(data).pow(2).doubleValue(), this, null);
 
-        double derivative = valueOf(data).multiply(valueOf(2)).doubleValue();
+        double derivative = valueOf(data).multiply(valueOf(2.0)).doubleValue();
 
         value.backward = () -> {
             this.gradient = valueOf(this.gradient).add(valueOf(derivative).multiply(valueOf(value.gradient))).doubleValue();
@@ -84,7 +84,7 @@ public class Value {
     }
 
     Value tanh() {
-        double tanh = valueOf(Math.tanh(data)).doubleValue();
+        double tanh = Math.tanh(data);
         Value value = new Value(tanh, this, null);
 
         double derivative = 1 - (Math.pow(tanh, 2));
@@ -96,28 +96,33 @@ public class Value {
         return value;
     }
 
-    Value sigmoid() {
-        double sigmoidValue = sigmoid(data);
-        Value value = new Value(sigmoidValue, this, null);
-
-        double derivative = sigmoidValue * (1 - sigmoidValue);
-
-        value.backward = () -> {
-            this.gradient += derivative * value.gradient;
-        };
-
-        return value;
-    }
+//    Value sigmoid() {
+//        double sigmoidValue = sigmoid(data);
+//        Value value = new Value(sigmoidValue, this, null);
+//
+//        double derivative = sigmoidValue * (1 - sigmoidValue);
+//
+//        value.backward = () -> {
+//            this.gradient += derivative * value.gradient;
+//        };
+//
+//        return value;
+//    }
 
     public void applyGrad() {
         if (gradientApplicable) {
-            data = data - gradient * 0.1;
-//            gradient = 0;
+            data = data - gradient * 0.01;
         }
     }
 
-    private double sigmoid(double x) {
-        return 1.0 / (1.0 + Math.exp(-x));
+    public void zeroGrad() {
+        if (gradientApplicable) {
+            gradient = 0;
+        }
+    }
+
+    public void gradinetOne() {
+        gradient = 1;
     }
 
     interface Backward {

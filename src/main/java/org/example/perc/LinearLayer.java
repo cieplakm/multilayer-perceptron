@@ -20,15 +20,4 @@ class LinearLayer implements Layer {
 
         return new Tensor(out);
     }
-
-    private void describeNeurons() {
-        for (int i = 0; i < neurons.length; i++) {
-            Neuron neuron = neurons[i];
-            String s = "Neuron["+i+"] B=" + neuron.bias.data;
-            for (int j = 0; j < neuron.weights.length; j++) {
-                s = s + " W[" + j + "]=" + neuron.weights[j].data;
-            }
-            System.out.println(s);
-        }
-    }
 }
