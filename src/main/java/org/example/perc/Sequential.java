@@ -7,10 +7,11 @@ class Sequential {
         this.layers = layers;
     }
 
-    Tensor call(Tensor data) {
+    Tensor predict(Tensor data) {
 
         for (Layer layer : layers) {
-            data = layer.call(data);
+            Tensor call = layer.call(data);
+            data = call;
         }
 
         return data;

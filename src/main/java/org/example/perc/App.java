@@ -1,82 +1,89 @@
 package org.example.perc;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.example.perc.MSE.loss;
 
 class App {
 
-    static class TreningData {
-        Tensor value;
-        Value target;
-
-        TreningData(Tensor value, Value target) {
-            this.value = value;
-            this.target = target;
-        }
-    }
-
     static TreningData[] treningData = {
-            new TreningData(new Tensor(100, 1), Value.of(1)),
-            new TreningData(new Tensor(1, 100), Value.of(0)),
-            new TreningData(new Tensor(100, 0), Value.of(1)),
-            new TreningData(new Tensor(1, 50), Value.of(0)),
-            new TreningData(new Tensor(0, 0), Value.of(0)),
-            new TreningData(new Tensor(50, 50), Value.of(0)),
-
+            new TreningData(new Tensor(3.31, 1.58, 0.66, 0.97, 0.3), Value.of(1)),
+//            new TreningData(new Tensor(2, 5), Value.of(-1)),
     };
 
     public static void main(String[] args) {
-        List<TreningData> trues = IntStream.range(0, 10)
-                .mapToObj(i->new TreningData(new Tensor(getLarge(), getSmall()), Value.of(1)))
-                .collect(Collectors.toList());
-        List<TreningData> falses = IntStream.range(0, 10)
-                .mapToObj(i->new TreningData(new Tensor(getSmall(), getLarge()), Value.of(0)))
-                .collect(Collectors.toList());
+//        treningData = extendedTreningData().toArray(new TreningData[]{});
 
-        ArrayList<TreningData> treningData1 = new ArrayList<>(trues);
-        treningData1.addAll(falses);
-//        treningData = treningData1.toArray(new TreningData[]{});
+        LinearLayer linearLayer = new LinearLayer(5, 2);
+        LinearLayer linearLayer2 = new LinearLayer(2, 4);
+        LinearLayer linearLayer3 = new LinearLayer(4, 1);
+        Sequential sequential = new Sequential(linearLayer, linearLayer2, linearLayer3);
 
-        LinearLayer linearLayer = new LinearLayer(2, 1);
-
-        Sequential sequential = new Sequential(
-                linearLayer
-        );
-
-        int epoch = 25;
-        System.out.println("-----trening-----");
-
+        int epoch = 100;
         for (int i = 0; i < epoch; i++) {
             System.out.println("-----Epoch[" + i + "]------");
             for (TreningData data : treningData) {
-                linearLayer.trainNeuron(data.value, data.target);
+                Tensor prediction = sequential.predict(data.value);
+                for (Value predVal : prediction.values) {
+                    Value loss = loss(predVal, data.target);
+                    loss.gradient = 1;
+                    backpropagate(loss);
+                    applyGradient(loss);
+                }
             }
-            Tensor call = sequential.call(new Tensor(new double[]{0, 20}));
-            System.out.println("Result:  " + call);
         }
 
+        checkNTimes(sequential);
+
+//        Tensor call = sequential.predict(new Tensor(6, 4, 1.5, 1, 0.9));
+//        System.out.println("Answer: " + call);
+//        System.out.println("Answer: " +new DecimalFormat("##.##").format(BigDecimal.valueOf(((call.values[0].data+1)*50))) + "%");
+    }
+
+    private static void checkNTimes(Sequential sequential) {
         System.out.println("-----check-----");
         double maxLos = 0;
-        for (int i = 0; i <1000000; i++) {
-            Tensor call = sequential.call(new Tensor(new double[]{0, 0}));
-            double l = loss(call.values[0], Value.of(0)).data;
-//            if (loss(call.values[0], Value.of(0)).data > 0.2) {
-//                throw new RuntimeException("Chuj");
-//            }
+        double sum = 0;
 
-            if (l>maxLos){
+        int times = 100;
+        for (int i = 0; i < times; i++) {
+            Tensor call = sequential.predict(new Tensor(6, 4, 1.5, 1, 0.9));
+            double l = loss(call.values[0], Value.of(1)).data;
+            sum += l;
+            if (Math.abs(l) > Math.abs(maxLos)) {
                 maxLos = l;
             }
-
         }
         System.out.println("MAX LOSS: " + maxLos);
-//        System.out.println("Answer: " + call);
+        System.out.println("AVG LOSS: " + sum / times);
+    }
+
+    private static void applyGradient(Value value) {
+        value.applyGrad();
+
+        if (value.parentA != null) {
+            applyGradient(value.parentA);
+        }
+        if (value.parentB != null) {
+            applyGradient(value.parentB);
+        }
+    }
+
+    private static void backpropagate(Value value) {
+        value.backward.back();
+
+        if (value.parentA != null && value.parentA.backward != null) {
+            backpropagate(value.parentA);
+        }
+        if (value.parentB != null && value.parentB.backward != null) {
+            backpropagate(value.parentB);
+        }
     }
 
     private static double getLarge() {
@@ -89,5 +96,26 @@ class App {
         return random.nextDouble(500);
     }
 
+    private static ArrayList<TreningData> extendedTreningData() {
+        List<TreningData> trues = IntStream.range(0, 100)
+                .mapToObj(i -> new TreningData(new Tensor(getLarge(), getSmall()), Value.of(1)))
+                .collect(Collectors.toList());
+        List<TreningData> falses = IntStream.range(0, 100)
+                .mapToObj(i -> new TreningData(new Tensor(getSmall(), getLarge()), Value.of(-1)))
+                .collect(Collectors.toList());
 
+        ArrayList<TreningData> treningData1 = new ArrayList<>(trues);
+        treningData1.addAll(falses);
+        return treningData1;
+    }
+
+    static class TreningData {
+        Tensor value;
+        Value target;
+
+        TreningData(Tensor value, Value target) {
+            this.value = value;
+            this.target = target;
+        }
+    }
 }

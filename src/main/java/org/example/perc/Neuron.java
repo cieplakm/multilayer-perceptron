@@ -1,9 +1,6 @@
 package org.example.perc;
 
-import java.util.Random;
 import java.util.stream.DoubleStream;
-
-import static org.example.perc.MSE.loss;
 
 class Neuron {
 
@@ -12,9 +9,17 @@ class Neuron {
     Value bias;
 
     Neuron(int inSize) {
-        Random random = new Random();
-        this.weights = DoubleStream.generate(Math::random).limit(inSize).mapToObj(Value::new).toArray(Value[]::new);
-        this.bias = new Value(Math.random());
+        this.weights = DoubleStream.generate(Math::random)
+                .limit(inSize)
+                .mapToObj(Value::ofGradientable)
+                .toArray(Value[]::new);
+//        this.weights = new Tensor(-0.19, 0.24, -0.29, 0.23, 0.1).values;
+        this.bias = Value.ofGradientable(Math.random());
+//        this.bias = Value.ofGradientable(-0.93);
+
+        for (Value weight : weights) {
+            weight.gradientApplicable = true;
+        }
     }
 
     Value predict(Tensor tensor) {
@@ -24,29 +29,16 @@ class Neuron {
 
         Value out = bias;
 
-        for (int i = 0; i < tensor.values.length; i++) {
+        Value[] ws = new Value[weights.length];
+
+        for (int i = 0; i < weights.length; i++) {
+            ws[i] = weights[i].multiply(tensor.values[i]);
             Value multiply = weights[i].multiply(tensor.values[i]);
             out = out.add(multiply);
         }
 
-        return out.sigmoid();
-    }
+        Value tanh = out.tanh();
 
-    public void train(Tensor tensor, Value target) {
-        if (tensor.values.length != weights.length) {
-            throw new IllegalArgumentException();
-        }
-
-        Value prediction = predict(tensor);
-        Value error = target.subtract(prediction);
-//        loss(prediction, target);
-        Value biasBefore = bias;
-        bias = bias.add(learningRate.multiply(error));
-
-        for (int i = 0; i < weights.length; i++) {
-            Value delta = learningRate.multiply(error).multiply(tensor.values[i]);
-            Value sum = weights[i].add(delta);
-            weights[i] = sum;
-        }
+        return tanh;
     }
 }
