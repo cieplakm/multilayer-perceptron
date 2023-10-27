@@ -28,6 +28,6 @@ public class Networks {
                 .stream()
                 .map(layerProjection -> new LinearLayer(layerProjection.getNeurons())).toArray(Layer[]::new);
 
-        return new SequentialNetworkModel(projection.getName(), Value.of(projection.getLearningRate()), ls);
+        return new SequentialNetworkModel(projection.getName(), Value.of(projection.getLearningRate()), projection.getTrainedEpochs(), ls);
     }
 }

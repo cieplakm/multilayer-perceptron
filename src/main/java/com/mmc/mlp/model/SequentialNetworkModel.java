@@ -12,11 +12,13 @@ public class SequentialNetworkModel {
     private final String name;
     private final Value learningRate;
     private final Layer[] layers;
+    private long trainedEpochs;
 
 
-    SequentialNetworkModel(String name, Value learningRate, Layer... layers) {
+    SequentialNetworkModel(String name, Value learningRate, long trainedEpochs, Layer... layers) {
         this.name = name;
         this.learningRate = learningRate;
+        this.trainedEpochs = trainedEpochs;
         this.layers = layers;
     }
 
@@ -56,6 +58,8 @@ public class SequentialNetworkModel {
             }
         }
 
+        trainedEpochs += epoch;
+
         long t2 = System.currentTimeMillis();
         System.out.println(String.format("Trening %s epoch done in %sms", epoch, t2 - t1));
     }
@@ -67,7 +71,7 @@ public class SequentialNetworkModel {
             layerProjections.add(new LayerProjection(i, layer.neuronProjections()));
         }
 
-        return new ModelProjection(name, learningRate.data(), layerProjections);
+        return new ModelProjection(name, learningRate.data(), trainedEpochs, layerProjections);
     }
 
     private int inSize(int layer, int inputSize, int[] doubles) {

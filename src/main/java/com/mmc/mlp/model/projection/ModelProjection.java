@@ -9,5 +9,6 @@ public class ModelProjection {
 
     String name;
     double learningRate;
+    long trainedEpochs;
     List<LayerProjection> layers;
 }
