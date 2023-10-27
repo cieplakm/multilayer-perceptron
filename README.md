@@ -31,7 +31,7 @@ TrainItem[] trainingData = = new TrainItem[] {
 String modelName= "some_model";
 int layers = 2;
 int inputSize = 4;
-int outputSize = 1;
+int outputSize = 2;
 double learningRate = 0.1;
 int epoch = 10_000;
 int[] nextLayersInputSize = new int[]{2}; //lenght: (layers-1)
