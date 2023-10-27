@@ -1,11 +1,12 @@
-package org.example.perc;
+package org.example.perc.model;
 
+import org.example.perc.projection.WeightProjection;
+
+import java.util.List;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
 class Neuron {
-
-    Value learningRate = new Value(0.5);
     Value[] weights;
     Value bias;
 
@@ -15,17 +16,18 @@ class Neuron {
                 .limit(inSize)
                 .mapToObj(Value::ofGradientable)
                 .toArray(Value[]::new);
-//        this.weights = new Tensor(-0.19, 0.24, -0.29, 0.23, 0.1).values;
         this.bias = Value.ofGradientable(random.nextDouble());
-//        this.bias = Value.ofGradientable(-0.93);
+    }
 
-        for (Value weight : weights) {
-            weight.gradientApplicable = true;
-        }
+    public Neuron(double bias, List<WeightProjection> weights) {
+        this.bias = new Value(bias);
+        this.weights = weights.stream()
+                .map(weightProjection -> new Value(weightProjection.getWeight()))
+                .toArray(Value[]::new);
     }
 
     Value predict(Tensor tensor) {
-        if (tensor.values.length != weights.length) {
+        if (tensor.size() != weights.length) {
             throw new IllegalArgumentException();
         }
 
@@ -34,8 +36,8 @@ class Neuron {
         Value[] ws = new Value[weights.length];
 
         for (int i = 0; i < weights.length; i++) {
-            ws[i] = weights[i].multiply(tensor.values[i]);
-            Value multiply = weights[i].multiply(tensor.values[i]);
+            ws[i] = weights[i].multiply(tensor.values(i));
+            Value multiply = weights[i].multiply(tensor.values(i));
             out = out.add(multiply);
         }
 

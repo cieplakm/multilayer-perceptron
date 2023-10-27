@@ -1,29 +1,28 @@
-package org.example.perc;
+package org.example.perc.model;
 
 
 import java.math.BigDecimal;
 
-import static java.math.BigDecimal.*;
 import static java.math.BigDecimal.valueOf;
 
+
 public class Value {
-    double data;
-    Value parentA;
-    Value parentB;
-    double gradient = 0;
-    Backward backward;
+    private double data;
+    private Value parentA;
+    private Value parentB;
+    private double gradient = 0;
+    private Backward backward;
+    private boolean gradientApplicable;
 
-    boolean gradientApplicable;
-
-    public static Value of(int v) {
+    public static Value of(double v) {
         return new Value(v);
     }
 
-    Value(double d) {
+    public Value(double d) {
         this.data = d;
     }
 
-    Value(double d, Value parentA, Value parentB) {
+    public Value(double d, Value parentA, Value parentB) {
         this.data = d;
         this.parentA = parentA;
         this.parentB = parentB;
@@ -35,6 +34,28 @@ public class Value {
         return value1;
     }
 
+    public double data() {
+        return data;
+    }
+
+    public BigDecimal dataBD() {
+        return BigDecimal.valueOf(data);
+    }
+
+    public Value parentA() {
+        return parentA;
+    }
+
+    public Value parentB() {
+        return parentB;
+    }
+
+    public void backward() {
+        if (backward != null) {
+            backward.back();
+        }
+    }
+
     Value add(Value v) {
         Value value = new Value(valueOf(data).add(valueOf(v.data)).doubleValue(), this, v);
 
@@ -42,7 +63,7 @@ public class Value {
 
         value.backward = () -> {
             this.gradient = valueOf(gradient).add(valueOf(derivative).multiply(valueOf(value.gradient))).doubleValue();
-            v.gradient =  valueOf(v.gradient).add(valueOf(derivative).multiply(valueOf(value.gradient))).doubleValue();
+            v.gradient = valueOf(v.gradient).add(valueOf(derivative).multiply(valueOf(value.gradient))).doubleValue();
         };
 
         return value;
@@ -96,32 +117,19 @@ public class Value {
         return value;
     }
 
-//    Value sigmoid() {
-//        double sigmoidValue = sigmoid(data);
-//        Value value = new Value(sigmoidValue, this, null);
-//
-//        double derivative = sigmoidValue * (1 - sigmoidValue);
-//
-//        value.backward = () -> {
-//            this.gradient += derivative * value.gradient;
-//        };
-//
-//        return value;
-//    }
-
-    public void applyGrad() {
+    void applyGrad(Value speed) {
         if (gradientApplicable) {
-            data = data - gradient * 0.01;
+            data = data - gradient * speed.data();
         }
     }
 
-    public void zeroGrad() {
+    void zeroGradient() {
         if (gradientApplicable) {
             gradient = 0;
         }
     }
 
-    public void gradinetOne() {
+    void gradientOne() {
         gradient = 1;
     }
 
@@ -129,7 +137,6 @@ public class Value {
 
         void back();
     }
-
 
     @Override
     public String toString() {
