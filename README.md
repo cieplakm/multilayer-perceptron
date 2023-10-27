@@ -48,7 +48,7 @@ int layers = 2;
 int inputSize = 4;
 int outputSize = 2;
 double learningRate = 0.1;
-int epoch = 10_000;
+int epoch = 1_000;
 int[] nextLayersInputSize = new int[]{2}; //lenght: (layers-1)
 boolean loggingTrainig = true;
 
@@ -80,7 +80,7 @@ Networks.writeToFile(model);
 ```java
 SequentialNetworkModel model = ...
         
-Tensor toCheck = new Tensor(1, 0.1, 1, 0.5); // 0,4 - filled, 1,3 - not filled 
+Tensor toCheck = new Tensor(0.93, 0.15, 0.08, 0.82); // 0,4 - filled, 1,3 - not filled 
 
 Tensor prediction = modelmodel.predict(toCheck);
 

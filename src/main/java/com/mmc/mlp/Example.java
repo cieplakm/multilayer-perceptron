@@ -59,8 +59,8 @@ public class Example {
         SequentialNetworkModel pretrainedModel = Networks.readFromFile("pretrained_model");
 
         // test
-        Tensor crossedFilled = new Tensor(0.55, 0.1, 0.15, 0.6);
-        Tensor nonCrossedFilled = new Tensor(0.45, 0.5, 0.52, 0.55);
+        Tensor crossedFilled = new Tensor(0.93, 0.15, 0.08, 0.82);
+        Tensor nonCrossedFilled = new Tensor(0.45, 0.5, 0.52, 0.4);
 
         Tensor crossFilledNewModelPrediction = newModel.predict(crossedFilled);
         Tensor nonCrossFilledNewModelPrediction = newModel.predict(nonCrossedFilled);
@@ -73,14 +73,11 @@ public class Example {
         System.out.println("---- new model ---");
         System.out.println("Answer: " + interpretation(crossFilledNewModelPrediction));
         System.out.println("Loss: " + loss(crossFilledNewModelPrediction.valueAt(0), CROSS_FILLED_ANSWER.valueAt(0)));
-        System.out.println("------------------");
         System.out.println("Answer: " + interpretation(nonCrossFilledNewModelPrediction));
         System.out.println("Loss: " + loss(nonCrossFilledNewModelPrediction.valueAt(1), NON_CROSS_FILLED_ANSWER.valueAt(1)));
-        System.out.println("------------------");
         System.out.println("---- pretrained model ---");
         System.out.println("Answer: " + interpretation(crossFilledPretrainedModelPrediction));
         System.out.println("Loss: " + loss(crossFilledPretrainedModelPrediction.valueAt(0), CROSS_FILLED_ANSWER.valueAt(0)));
-        System.out.println("------------------");
         System.out.println("Answer: " + interpretation(nonCrossFilledPretrainedPrediction));
         System.out.print("Loss: " + loss(nonCrossFilledPretrainedPrediction.valueAt(1), NON_CROSS_FILLED_ANSWER.valueAt(1)));
     }
