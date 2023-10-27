@@ -1,32 +1,47 @@
 # Multilayer perceptron model example
 
-## Usage
+### Problem
+Try to recognize when cross (0,3;1,2) fields are filled.
+```
++-----+-----+
+|     |     | 
+|  0  |  1  | 
+|     |     | 
++-----+-----+
+|     |     | 
+|  2  |  3  | 
+|     |     | 
++-----+-----+
+```
+
 
 ### Training data
 ```java
-Tensor wrongAnswer = new Tensor(-1, 1);
-Tensor correctAnswer = new Tensor(1, -1);
+Tensor crossFilledAnswer = new Tensor(-1, 1);
+Tensor nonCrossFilledAnswer = new Tensor(1, -1);
         
 TrainItem[] trainingData = = new TrainItem[] {
-                new TrainItem(new Tensor(0.7, 0.3, 0.3, 0.7), correctAnswer),
-                new TrainItem(new Tensor(0.3, 0.7, 0.7, 0.3), correctAnswer),
-                new TrainItem(new Tensor(0.7, 0.7, 0.7, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.7, 0.7, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.3, 0.7, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.7, 0.3, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.7, 0.7, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.3, 0.3, 0.3), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.7, 0.3, 0.3), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.3, 0.7, 0.3), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.3, 0.3, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.3, 0.3, 0.3), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.7, 0.3, 0.3), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.7, 0.3, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.3, 0.3, 0.7, 0.7), wrongAnswer),
-                new TrainItem(new Tensor(0.7, 0.3, 0.7, 0.3), wrongAnswer)
+                new TrainItem(new Tensor(0.7, 0.3, 0.3, 0.7), crossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.7, 0.7, 0.3), crossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.7, 0.7, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.7, 0.7, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.3, 0.7, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.7, 0.3, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.7, 0.7, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.3, 0.3, 0.3), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.7, 0.3, 0.3), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.3, 0.7, 0.3), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.3, 0.3, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.3, 0.3, 0.3), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.7, 0.3, 0.3), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.7, 0.3, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.3, 0.3, 0.7, 0.7), nonCrossFilledAnswer),
+                new TrainItem(new Tensor(0.7, 0.3, 0.7, 0.3), nonCrossFilledAnswer)
         };
 ```
 ### Train new model
+
+
 ```java
 String modelName= "some_model";
 int layers = 2;
@@ -65,7 +80,7 @@ Networks.writeToFile(model);
 ```java
 SequentialNetworkModel model = ...
         
-Tensor toCheck = new Tensor(1, 0.1, 1, 0.5);
+Tensor toCheck = new Tensor(1, 0.1, 1, 0.5); // 0,4 - filled, 1,3 - not filled 
 
 Tensor prediction = modelmodel.predict(toCheck);
 

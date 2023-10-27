@@ -28,8 +28,8 @@ public class Tensor {
 
     @Override
     public String toString() {
-        return Stream.of(values)
+        return "(" + Stream.of(values)
                 .map(Value::toString)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(", ")) + ")";
     }
 }

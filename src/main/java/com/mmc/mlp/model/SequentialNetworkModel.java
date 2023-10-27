@@ -6,8 +6,6 @@ import com.mmc.mlp.model.projection.ModelProjection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mmc.mlp.model.MSE.loss;
-
 public class SequentialNetworkModel {
     private final String name;
     private final Value learningRate;
@@ -49,7 +47,7 @@ public class SequentialNetworkModel {
             for (TrainItem data : trainItems) {
                 Tensor prediction = predict(data.getData());
                 for (int k = 0; k < prediction.size(); k++) {
-                    Value loss = loss(prediction.valueAt(k), data.getTarget().valueAt(k), logging);
+                    Value loss = MSE.lossLoggable(prediction.valueAt(k), data.getTarget().valueAt(k), logging);
                     loss.gradientOne();
                     backPropagate(loss);
                     applyGradient(loss);
@@ -61,7 +59,7 @@ public class SequentialNetworkModel {
         trainedEpochs += epoch;
 
         long t2 = System.currentTimeMillis();
-        System.out.println(String.format("Trening %s epoch done in %sms", epoch, t2 - t1));
+        System.out.println(String.format("Training %s epochs is done in %sms", epoch, t2 - t1));
     }
 
     public ModelProjection networkProjection() {
