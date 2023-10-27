@@ -1,9 +1,10 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
-import org.example.perc.projection.NetworkProjection;
+import com.mmc.mlp.model.projection.ModelProjection;
 
-import static org.example.perc.ObjectToFile.readObjectFromFile;
-import static org.example.perc.ObjectToFile.saveObjectToFile;
+import static com.mmc.mlp.utils.ModelIO.readObjectFromFile;
+import static com.mmc.mlp.utils.ModelIO.saveObjectToFile;
+
 
 public class Networks {
 
@@ -13,16 +14,16 @@ public class Networks {
     }
 
     public static SequentialNetworkModel readFromFile(String modelName) {
-        NetworkProjection networkProjection = readObjectFromFile(modelName, NetworkProjection.class);
-        return recreate(networkProjection);
+        ModelProjection modelProjection = readObjectFromFile(modelName, ModelProjection.class);
+        return recreate(modelProjection);
     }
 
     public static void writeToFile(SequentialNetworkModel model) {
-        NetworkProjection networkProjection = model.networkProjection();
-        saveObjectToFile(networkProjection, networkProjection.getName());
+        ModelProjection modelProjection = model.networkProjection();
+        saveObjectToFile(modelProjection, modelProjection.getName());
     }
 
-    static SequentialNetworkModel recreate(NetworkProjection projection) {
+    private static SequentialNetworkModel recreate(ModelProjection projection) {
         Layer[] ls = projection.getLayers()
                 .stream()
                 .map(layerProjection -> new LinearLayer(layerProjection.getNeurons())).toArray(Layer[]::new);

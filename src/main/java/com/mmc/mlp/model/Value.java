@@ -1,4 +1,4 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
 
 import java.math.BigDecimal;

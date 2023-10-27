@@ -1,9 +1,9 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
 import lombok.Value;
 
 @Value
-public class TreningSet {
+public class TrainItem {
 
     Tensor data;
     Tensor target;

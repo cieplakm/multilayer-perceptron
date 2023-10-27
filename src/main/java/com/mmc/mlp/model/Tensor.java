@@ -1,4 +1,4 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class Tensor {
         this.values = values;
     }
 
-    public Value values(int index) {
+    public Value valueAt(int index) {
         return values[index];
     }
 

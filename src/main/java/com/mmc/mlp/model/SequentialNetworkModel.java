@@ -1,16 +1,16 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
-import org.example.perc.projection.LayerProjection;
-import org.example.perc.projection.NetworkProjection;
+import com.mmc.mlp.model.projection.LayerProjection;
+import com.mmc.mlp.model.projection.ModelProjection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.perc.model.MSE.loss;
+import static com.mmc.mlp.model.MSE.loss;
 
 public class SequentialNetworkModel {
-    private String name;
-    private Value learningRate;
+    private final String name;
+    private final Value learningRate;
     private final Layer[] layers;
 
 
@@ -29,28 +29,8 @@ public class SequentialNetworkModel {
         this.layers = new Layer[numOfLayers];
 
         for (int layer = 0; layer < numOfLayers; layer++) {
-            this.layers[layer] = new LinearLayer(inLayerSize(layer, inputSize, layerOutputs), outLayerSize(numOfLayers, layer, outputSize, layerOutputs));
+            this.layers[layer] = new LinearLayer(inSize(layer, inputSize, layerOutputs), outSize(numOfLayers, layer, outputSize, layerOutputs));
         }
-    }
-
-    private int inLayerSize(int layer, int inputSize, int[] doubles) {
-        if (layer == 0) {
-            return inputSize;
-        }
-
-        return doubles[layer - 1];
-    }
-
-    private static int outLayerSize(int numOfLayers, int layer, int outputSize, int[] doubles) {
-        if (layer == numOfLayers - 1) {
-            return outputSize;
-        }
-
-        if (layer == 0) {
-            return doubles[layer];
-        }
-
-        return doubles[layer];
     }
 
     public Tensor predict(Tensor data) {
@@ -61,13 +41,13 @@ public class SequentialNetworkModel {
         return data;
     }
 
-    public void train(int epoch, TreningSet[] treningSets, boolean logging, Double stopWhenError) {
+    public void train(int epoch, TrainItem[] trainItems, boolean logging) {
         long t1 = System.currentTimeMillis();
         for (int i = 0; i < epoch; i++) {
-            for (TreningSet data : treningSets) {
+            for (TrainItem data : trainItems) {
                 Tensor prediction = predict(data.getData());
                 for (int k = 0; k < prediction.size(); k++) {
-                    Value loss = loss(prediction.values(k), data.getTarget().values(k), logging);
+                    Value loss = loss(prediction.valueAt(k), data.getTarget().valueAt(k), logging);
                     loss.gradientOne();
                     backPropagate(loss);
                     applyGradient(loss);
@@ -78,7 +58,32 @@ public class SequentialNetworkModel {
 
         long t2 = System.currentTimeMillis();
         System.out.println(String.format("Trening %s epoch done in %sms", epoch, t2 - t1));
+    }
 
+    public ModelProjection networkProjection() {
+        List<LayerProjection> layerProjections = new ArrayList<>();
+        for (int i = 0; i < layers.length; i++) {
+            Layer layer = layers[i];
+            layerProjections.add(new LayerProjection(i, layer.neuronProjections()));
+        }
+
+        return new ModelProjection(name, learningRate.data(), layerProjections);
+    }
+
+    private int inSize(int layer, int inputSize, int[] doubles) {
+        if (layer == 0) {
+            return inputSize;
+        }
+
+        return doubles[layer - 1];
+    }
+
+    private static int outSize(int numOfLayers, int layer, int outputSize, int[] doubles) {
+        if (layer == numOfLayers - 1) {
+            return outputSize;
+        }
+
+        return doubles[layer];
     }
 
     private void backPropagate(Value value) {
@@ -112,15 +117,5 @@ public class SequentialNetworkModel {
         if (value.parentB() != null) {
             zeroGradient(value.parentB());
         }
-    }
-
-    public NetworkProjection networkProjection() {
-        List<LayerProjection> layerProjections = new ArrayList<>();
-        for (int i = 0; i < layers.length; i++) {
-            Layer layer = layers[i];
-            layerProjections.add(new LayerProjection(i, layer.neuronProjections()));
-        }
-
-        return new NetworkProjection(name, learningRate.data(), layerProjections);
     }
 }

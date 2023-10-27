@@ -1,11 +1,11 @@
-package org.example.perc.projection;
+package com.mmc.mlp.model.projection;
 
 import lombok.Value;
 
 import java.util.List;
 
 @Value
-public class NetworkProjection {
+public class ModelProjection {
 
     String name;
     double learningRate;

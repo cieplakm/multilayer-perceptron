@@ -1,6 +1,6 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
-import org.example.perc.projection.NeuronProjection;
+import com.mmc.mlp.model.projection.NeuronProjection;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
-package org.example.perc;
+package com.mmc.mlp.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ObjectToFile {
+public class ModelIO {
 
     public static void saveObjectToFile(Object object, String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();

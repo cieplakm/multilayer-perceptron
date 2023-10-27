@@ -1,4 +1,4 @@
-package org.example.perc.model;
+package com.mmc.mlp.model;
 
 class MSE {
     static Value loss(Value predicted, Value target, boolean log) {

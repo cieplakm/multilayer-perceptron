@@ -1,4 +1,4 @@
-package org.example.perc.projection;
+package com.mmc.mlp.model.projection;
 
 import lombok.Value;
 
